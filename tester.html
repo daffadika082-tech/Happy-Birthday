@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sebuah Pesan Untukmu!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff6f61;
+            --secondary-color: #fcb69f;
+            --accent-color: #e15f78;
+            --text-color: #333;
+            --light-text-color: #f8f8f8;
+            --background-gradient: linear-gradient(to bottom right, #ffecd2, #fcb69f);
+            --envelope-color: #fce8d5;
+            --envelope-shadow: rgba(0,0,0,0.2);
+            --card-color: #fff9e6;
+            --cake-color-base: #FFC0CB; /* Pink Pastel */
+            --cake-color-dark: #FF99AA;
+            --frosting-color: #FFFFFF;
+            --candle-color: #A020F0; /* Ungu */
+            --flame-color-outer: #FFD700; /* Kuning keemasan */
+            --flame-color-inner: #FF69B4; /* Hot pink */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--background-gradient);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* [CSS untuk Greeting Screen & Envelope tidak berubah, saya persingkat di sini] */
+        #greeting-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; text-align: center; background: var(--background-gradient); z-index: 1000; transition: opacity 0.8s ease-out; overflow: hidden; }
+        .ornament { position: absolute; font-size: 2em; opacity: 0; animation: sparkle 7s infinite ease-in-out; }
+        @keyframes sparkle { 0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); } 25% { opacity: 1; transform: scale(1.2) rotate(20deg); } 75% { opacity: 1; transform: scale(1.2) rotate(-20deg); } }
+        .ornament:nth-child(1) { top: 15%; left: 10%; content: '✨'; animation-delay: 0s; } .ornament:nth-child(2) { top: 20%; right: 15%; content: '💖'; animation-delay: 1s; font-size: 1.5em; } .ornament:nth-child(3) { bottom: 25%; left: 20%; content: '⭐'; animation-delay: 2s; } .ornament:nth-child(4) { bottom: 15%; right: 10%; content: '🎉'; animation-delay: 3s; font-size: 2.5em; } .ornament:nth-child(5) { top: 50%; left: 25%; content: '💖'; animation-delay: 4s; } .ornament:nth-child(6) { top: 60%; right: 25%; content: '✨'; animation-delay: 5s; }
+        .greeting-content { background: rgba(255, 255, 255, 0.9); padding: 30px 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); transform: scale(0.9); animation: popInGreeting 0.5s forwards; position: relative; z-index: 1; width: 350px; height: 380px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .greeting-emoji { font-size: 100px; margin-bottom: 5px; animation: gentleBob 3s infinite ease-in-out; line-height: 1; }
+        @keyframes gentleBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes popInGreeting { to { transform: scale(1); } }
+        .greeting-content h2 { font-family: 'Pacifico', cursive; font-size: 2.5em; color: var(--primary-color); margin: 0 0 10px 0; }
+        .greeting-content p { font-size: 1.2em; color: #555; margin-top: 0; }
+        #open-letter-btn { font-family: 'Poppins', sans-serif; font-weight: bold; font-size: 1em; padding: 10px 20px; border: none; background-color: var(--primary-color); color: white; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); position: absolute; bottom: 30px; transition: all 0.3s ease-in-out; }
+        #open-letter-btn:hover { transform: scale(1.05); background-color: var(--accent-color); }
+        #envelope-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: var(--background-gradient); z-index: 1001; opacity: 0; pointer-events: none; transition: opacity 0.5s ease-in-out; }
+        #envelope { position: relative; width: 300px; height: 200px; background-color: var(--envelope-color); border-radius: 10px; box-shadow: 0 10px 20px var(--envelope-shadow); transform: scale(0.5); opacity: 0; transition: transform 0.5s ease-out, opacity 0.5s ease-out; cursor: pointer; }
+        #envelope.show { transform: scale(1); opacity: 1; }
+        #envelope::before { content: ''; position: absolute; top: 0; left: 0; width: 0; height: 0; border-style: solid; border-width: 100px 150px 100px 150px; border-color: var(--envelope-color) var(--secondary-color) var(--accent-color) var(--envelope-color); border-radius: 10px; z-index: 1; }
+        #envelope .back-flap { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: transparent; border-radius: 10px; overflow: hidden; }
+        #envelope .back-flap::before { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 0; border-style: solid; border-width: 0 150px 100px 150px; border-color: transparent transparent rgba(0,0,0,0.1) transparent; transform-origin: bottom; transition: transform 0.5s ease-out; z-index: 2; }
+        #envelope .back-flap::after { content: ''; position: absolute; top: 0; left: 0; width: 0; height: 0; border-style: solid; border-width: 100px 0 100px 150px; border-color: var(--envelope-color) transparent var(--envelope-color) rgba(0,0,0,0.05); z-index: 2; }
+        #envelope .back-flap.open::before { transform: translateY(10px); }
+        #envelope .card { position: absolute; top: 10px; left: 10px; width: calc(100% - 20px); height: calc(100% - 20px); background-color: var(--card-color); border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 3; transform: translateY(0); transition: transform 0.8s ease-out; display: flex; justify-content: center; align-items: center; font-family: 'Pacifico', cursive; font-size: 1.5em; color: var(--primary-color); text-shadow: 1px 1px 2px rgba(0,0,0,0.1); overflow: hidden; }
+        #envelope .front-flap { position: absolute; top: 0; left: 0; width: 0; height: 0; border-style: solid; border-width: 100px 150px 0 150px; border-color: var(--envelope-color) transparent transparent var(--envelope-color); transform-origin: top; transition: transform 0.5s ease-out; z-index: 4; }
+        #envelope .front-flap::before { content: '💖'; position: absolute; top: 30px; left: 50%; transform: translateX(-50%); font-size: 2em; color: var(--accent-color); text-shadow: 0 1px 2px rgba(0,0,0,0.2); z-index: 5; opacity: 1; transition: opacity 0.3s ease-out; }
+        #envelope.open .front-flap { transform: rotateX(180deg); z-index: 2; }
+        #envelope.open .front-flap::before { opacity: 0; }
+        #envelope.card-out .card { transform: translateY(-220px); }
+
+        #main-content { display: none; min-height: 100vh; justify-content: center; align-items: center; position: relative; padding: 20px 0; animation: fadeInMain 1.5s forwards; }
+        @keyframes fadeInMain { from { opacity: 0; } to { opacity: 1; } }
+        .container { background-color: rgba(255, 255, 255, 0.95); border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.2); padding: 40px; margin: 20px; max-width: 900px; text-align: center; position: relative; border: 5px dashed var(--secondary-color); animation: borderPulse 3s infinite alternate; }
+        @keyframes borderPulse { 0% { border-color: var(--secondary-color); box-shadow: 0 15px 30px rgba(0,0,0,0.2); } 100% { border-color: var(--primary-color); box-shadow: 0 15px 40px rgba(0,0,0,0.3); } }
+        .container::before, .container::after { content: '🎈'; position: absolute; font-size: 2.5em; z-index: 1; animation: floatBalloon 5s infinite ease-in-out alternate; }
+        .container::before { top: -20px; left: -10px; transform: rotate(-15deg); }
+        .container::after { bottom: -20px; right: -10px; transform: rotate(15deg); animation-delay: 1s; }
+        @keyframes floatBalloon { 0%, 100% { transform: translateY(0) rotate(-15deg); } 50% { transform: translateY(-15px) rotate(10deg); } }
+        h1 { font-family: 'Pacifico', cursive; color: var(--primary-color); font-size: 3.5em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); animation: pulse 2s infinite alternate; }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+        .letter { font-family: 'Dancing Script', cursive; font-size: 1.5em; line-height: 1.8; text-align: left; margin: 30px auto; max-width: 700px; color: #555; background-color: var(--card-color); padding: 25px; border-radius: 10px; box-shadow: inset 0 0 10px rgba(0,0,0,0.05); position: relative; border: 1px solid #ffe0b2; z-index: 2; }
+        .typing-cursor::after { content: '|'; animation: blink 0.7s infinite; color: var(--primary-color); font-weight: bold; }
+        @keyframes blink { 50% { opacity: 0; } }
+        .letter .signature { font-family: 'Pacifico', cursive; margin-top: 40px; text-align: right; font-size: 1.8em; color: var(--primary-color); opacity: 0; transition: opacity 1.5s ease-in-out; }
+        .highlight { color: var(--accent-color); font-weight: bold; font-family: 'Dancing Script', cursive; font-size: 1.1em; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); display: inline-block; vertical-align: bottom; }
+        .confetti { position: absolute; width: 10px; height: 10px; top: -10px; opacity: 0; animation: fall 5s infinite; border-radius: 50%; background-color: var(--primary-color); }
+        .confetti:nth-child(2n) { background-color: var(--accent-color); } .confetti:nth-child(3n) { background-color: var(--secondary-color); } .confetti:nth-child(4n) { background-color: #ffcc00; } .confetti:nth-child(5n) { background-color: #00bfff; }
+        @keyframes fall { 0% { transform: translateY(0) rotateZ(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(100vh) rotateZ(720deg); opacity: 0; } }
+        .confetti:nth-child(1) { left: 10%; animation-delay: 0s; } .confetti:nth-child(2) { left: 20%; animation-delay: 1s; } .confetti:nth-child(3) { left: 30%; animation-delay: 0.5s; } .confetti:nth-child(4) { left: 40%; animation-delay: 2s; } .confetti:nth-child(5) { left: 50%; animation-delay: 1.5s; } .confetti:nth-child(6) { left: 60%; animation-delay: 2.5s; } .confetti:nth-child(7) { left: 70%; animation-delay: 0.2s; } .confetti:nth-child(8) { left: 80%; animation-delay: 1.8s; } .confetti:nth-child(9) { left: 90%; animation-delay: 0.8s; } .confetti:nth-child(10) { left: 5%; animation-delay: 3s; } .confetti:nth-child(11) { left: 95%; animation-delay: 1.2s; } .confetti:nth-child(12) { left: 25%; animation-delay: 2.2s; } .confetti:nth-child(13) { left: 75%; animation-delay: 0.6s; }
+
+        /* --- PERUBAHAN BESAR: CSS Kue Ulang Tahun Baru yang Disederhanakan & Lilin Angka --- */
+        .cake-container {
+            margin: 40px auto;
+            position: relative;
+            width: 250px;
+            height: 300px; /* Tinggi disesuaikan untuk kue baru */
+            perspective: 1000px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* Memastikan kue berada di dasar container */
+        }
+
+        .cake {
+            position: relative; /* Bukan absolute lagi, agar lebih mudah dikelola */
+            width: 220px;
+            height: 250px; /* Cukup untuk semua lapisan dan lilin */
+            display: flex;
+            flex-direction: column-reverse; /* Membangun dari bawah ke atas */
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .cake-component {
+            position: absolute; /* Setiap komponen akan jatuh */
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0; /* Awalnya tidak terlihat */
+            animation: dropIn 0.5s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            margin-bottom: -5px; /* Sedikit overlap antar lapisan */
+        }
+
+        .cake-layer {
+            height: 50px;
+            background: var(--cake-color-base);
+            border-radius: 5px;
+            box-shadow: 0 5px 0px rgba(0,0,0,0.1), inset 0 -3px 0 rgba(0,0,0,0.1);
+        }
+        .layer-bottom { width: 220px; bottom: 0; z-index: 10; animation-delay: 0.5s; }
+        .layer-middle { width: 180px; bottom: 45px; z-index: 11; animation-delay: 1.0s; }
+        .layer-top { width: 140px; bottom: 90px; z-index: 12; animation-delay: 1.5s; }
+
+        .cake-frosting {
+            width: 140px; /* Sama dengan lebar lapisan teratas */
+            height: 25px;
+            background: var(--frosting-color);
+            border-radius: 50% / 12.5px;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+            bottom: 130px; /* Di atas lapisan teratas + sedikit */
+            z-index: 13;
+            animation-delay: 1.8s;
+        }
+
+        /* Styling lilin angka 22 */
+        .candles-container {
+            position: absolute;
+            bottom: 155px; /* Di atas frosting */
+            z-index: 14;
+            display: flex;
+            gap: 10px; /* Jarak antar angka 2 dan 2 */
+            animation-delay: 2.2s; /* Lilin jatuh setelah frosting */
+            opacity: 0;
+            animation: dropIn 0.4s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        
+        .candle-single {
+            position: relative;
+            width: 30px; /* Lebar lilin angka */
+            height: 50px; /* Tinggi lilin angka */
+            background-color: var(--candle-color);
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif; /* Font untuk angka */
+            font-weight: bold;
+            font-size: 2.5em; /* Ukuran angka */
+            color: var(--frosting-color); /* Warna angka */
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            box-shadow: inset -2px 0 0 rgba(0,0,0,0.1);
+        }
+
+        .flame {
+            position: absolute;
+            top: -15px; /* Di atas lilin */
+            width: 15px;
+            height: 25px;
+            background: radial-gradient(circle at 50% 10%, var(--flame-color-outer) 0%, var(--flame-color-inner) 50%, transparent 80%);
+            border-radius: 50% 50% 30% 30%;
+            filter: blur(1.5px);
+            animation: flameFlicker 0.7s infinite alternate ease-in-out;
+        }
+
+        @keyframes dropIn {
+            0% { transform: translateY(-300px) translateX(-50%) scale(0.8); opacity: 0; }
+            100% { transform: translateY(0) translateX(-50%) scale(1); opacity: 1; }
+        }
+        /* Override transform untuk candles-container agar tidak ada translateX(-50%) ganda */
+        .candles-container.cake-component {
+             transform: translateY(-300px) scale(0.8); /* Hanya translateY untuk awal */
+        }
+        .candles-container.cake-component[style*="opacity: 1"] {
+             transform: translateY(0) scale(1); /* Reset transform saat aktif */
+        }
+        
+        @keyframes flameFlicker {
+            0%, 100% { transform: scaleY(1) rotate(-2deg); opacity: 1; }
+            50% { transform: scaleY(1.1) rotate(2deg); opacity: 0.9; }
+        }
+        /* --- AKHIR PERUBAHAN BESAR --- */
+        
+        @media (max-width: 768px) { .greeting-content { width: 90%; height: auto; } h1 { font-size: 2.5em; } .letter { font-size: 1.2em; padding: 0 10px; } .cake-container { transform: scale(0.8); margin-top: -30px; margin-bottom: -30px; } }
+    </style>
+</head>
+<body>
+
+    <div id="greeting-screen">
+        <div class="ornament">✨</div> <div class="ornament">💖</div> <div class="ornament">⭐</div> <div class="ornament">🎉</div> <div class="ornament">💖</div> <div class="ornament">✨</div>
+        <div class="greeting-content">
+            <div class="greeting-emoji">😺</div>
+            <h2>Hai, Kaffah! 👋</h2>
+            <p id="click-message">Ada pesan rahasia, coba klik tombol di bawah!</p>
+            <button id="open-letter-btn">Klik Aku!</button>
+        </div>
+    </div>
+    
+    <div id="envelope-wrapper">
+        <div id="envelope">
+            <div class="back-flap"></div>
+            <div class="card">Untukmu!</div>
+            <div class="front-flap"></div>
+        </div>
+    </div>
+    
+    <div id="main-content">
+        <audio id="birthdayMusic" src="lagu.mp3" autoplay preload="auto"></audio>
+        <div class="confetti-container">
+            <div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div><div class="confetti"></div>
+        </div>
+        <div class="container">
+            <h1>Selamat Ulang Tahun! 🎉</h1>
+            
+            <div class="cake-container">
+                <div class="cake">
+                    <div class="cake-component cake-layer layer-bottom"></div>
+                    <div class="cake-component cake-layer layer-middle"></div>
+                    <div class="cake-component cake-layer layer-top"></div>
+                    
+                    <div class="cake-component cake-frosting"></div>
+
+                    <div class="cake-component candles-container">
+                        <div class="candle-single">
+                            <span class="number">2</span>
+                            <div class="flame"></div>
+                        </div>
+                        <div class="candle-single">
+                            <span class="number">2</span>
+                            <div class="flame"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="letter">
+                <p>Dear <span class="highlight">Islami al Kaffah Ramadhan S.Farm</span>,</p>
+                <p>Happy Birthday to my favorite person in my life! Today is all about celebrating you, your kindness, your smile, and everything that makes you truly amazing. I feel so lucky to know you, and even luckier to share moments of my life with you.</p>
+                <p>On this special day, I hope you are surrounded by love, laughter, and all the things that make you happiest. May this new chapter bring you endless opportunities, beautiful memories, and the strength to reach every dream you’re chasing.</p>
+                <p>Remember, no matter where life takes you, you will always have someone cheering for you. Thank you for being such an incredible person and for making the world a brighter place just by being in it.</p>
+                <p>So here’s to you, to your happiness, your health, and to all the amazing adventures waiting ahead. You truly deserve nothing but the best.</p>
+                <p>Happy Birthday once again, <span class="highlight">kaffah</span>. Let’s make this year unforgettable! 🎉💖</p>
+                <p class="signature">With all my love,<br>yours</p>
+            </div>
+            <div class="emoji">🎁🎈🎂</div>
+        </div>
+    </div>
+
+    <script>
+        const greetingScreen = document.getElementById('greeting-screen');
+        const openLetterBtn = document.getElementById('open-letter-btn');
+        const clickMessage = document.getElementById('click-message');
+        const envelopeWrapper = document.getElementById('envelope-wrapper');
+        const envelope = document.getElementById('envelope');
+        const mainContent = document.getElementById('main-content');
+        const birthdayMusic = document.getElementById('birthdayMusic');
+        
+        let clickCount = 0;
+
+        openLetterBtn.addEventListener('click', () => {
+            clickCount++;
+
+            if (clickCount === 1) {
+                clickMessage.textContent = "Hehe, coba tangkap lagi!";
+                openLetterBtn.textContent = "Klik di sini!";
+                openLetterBtn.style.top = '20px';
+                openLetterBtn.style.left = '20px';
+            } else if (clickCount === 2) {
+                clickMessage.textContent = "Wlee, hampir kena! Sekali lagi!";
+                openLetterBtn.textContent = "Yang ini, dong!";
+                openLetterBtn.style.top = 'auto';
+                openLetterBtn.style.bottom = '20px';
+                openLetterBtn.style.left = 'auto';
+                openLetterBtn.style.right = '20px';
+            } else if (clickCount === 3) {
+                clickMessage.textContent = "Yey, dapet! Ini dia suratnya...";
+                openLetterBtn.textContent = "Berhasil! ✨";
+                openLetterBtn.disabled = true;
+
+                setTimeout(() => {
+                    greetingScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        greetingScreen.style.display = 'none';
+                        envelopeWrapper.style.opacity = '1';
+                        envelopeWrapper.style.pointerEvents = 'auto';
+                        envelope.classList.add('show');
+                        birthdayMusic.play().catch(e => console.error("Audio play failed:", e));
+                    }, 800);
+                }, 1000);
+            }
+        });
+
+        envelope.addEventListener('click', () => {
+            if (!envelope.classList.contains('open')) {
+                envelope.classList.add('open');
+                setTimeout(() => {
+                    envelope.classList.add('card-out');
+                    setTimeout(() => {
+                        envelopeWrapper.style.opacity = '0';
+                        setTimeout(() => {
+                            envelopeWrapper.style.display = 'none';
+                            mainContent.style.display = 'flex';
+                            
+                            // Memicu animasi kue dan ketikan
+                            document.querySelector('.cake').classList.add('animate');
+                            typewriterEffect(); 
+                        }, 500);
+                    }, 1000);
+                }, 500);
+            }
+        });
+
+        async function typewriterEffect() {
+            const paragraphsToType = document.querySelectorAll('.letter p:not(.signature)');
+            const signature = document.querySelector('.letter .signature');
+            const nodesToType = [];
+            paragraphsToType.forEach(el => {
+                nodesToType.push({ el: el, childNodes: Array.from(el.childNodes) });
+                el.innerHTML = '';
+            });
+            const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+            const typeText = async (element, text) => {
+                for (let i = 0; i < text.length; i++) {
+                    if (text.substring(i, i+6) === '&nbsp;') {
+                        element.innerHTML += '&nbsp;';
+                        i += 5;
+                    } else {
+                        element.innerHTML += text[i];
+                    }
+                    await wait(35);
+                }
+            };
+            for (const item of nodesToType) {
+                const { el, childNodes } = item;
+                el.classList.add('typing-cursor');
+                for (const node of childNodes) {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        await typeText(el, node.textContent);
+                    } else if (node.nodeType === Node.ELEMENT_NODE) {
+                        el.innerHTML += node.outerHTML;
+                    }
+                }
+                el.classList.remove('typing-cursor');
+                await wait(500);
+            }
+            signature.style.opacity = '1';
+        }
+    </script>
+</body>
+</html>
